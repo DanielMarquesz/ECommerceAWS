@@ -19,6 +19,7 @@ export class ProductsAppStack extends cdk.Stack {
         handler: "handler",
         memorySize: 128,
         timeout: cdk.Duration.seconds(5),
+        runtime: lambda.Runtime.NODEJS_16_X,
         bundling: {
           minify: true,
           sourceMap: false, // desabilita geração de mapas para realizar debugs.
