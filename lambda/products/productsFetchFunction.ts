@@ -1,10 +1,10 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult, Context } from "aws-lambda"
 
 
-const handler = async (
+export async function handler(
   event: APIGatewayProxyEvent,
   context: Context
-  ): Promise<APIGatewayProxyResult> => {
+  ): Promise<APIGatewayProxyResult> {
 
     const lambdaRequestId = context.awsRequestId
     const apiRequestId = event.httpMethod
@@ -26,5 +26,3 @@ const handler = async (
       body: JSON.stringify({message: "Bad Request"})
     }
 }
-
-export default handler
