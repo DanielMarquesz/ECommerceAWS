@@ -1,13 +1,13 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult, Context } from "aws-lambda"
 
 
-export async function handler(
+export const handler = async (
   event: APIGatewayProxyEvent,
   context: Context
-  ): Promise<APIGatewayProxyResult> {
+  ): Promise<APIGatewayProxyResult> => {
 
     const lambdaRequestId = context.awsRequestId
-    const apiRequestId = event.httpMethod
+    const apiRequestId = event.requestContext.requestId
 
     console.log(`API Gateway RequestId: ${apiRequestId} - Lambda RequestId: ${lambdaRequestId}`)
 
