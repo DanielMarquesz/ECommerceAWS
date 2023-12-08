@@ -1,14 +1,29 @@
 import * as lambda from "aws-cdk-lib/aws-lambda"
 import * as lambdaNodeJs from "aws-cdk-lib/aws-lambda-nodejs"
 import * as cdk from "aws-cdk-lib"
+import * as dynamo from "aws-cdk-lib/aws-dynamodb"
 
 import { Construct } from "constructs"
 
 export class ProductsAppStack extends cdk.Stack {
   readonly productsFetchHandler: lambdaNodeJs.NodejsFunction
+  readonly productsAdminHandler: lambdaNodeJs.NodejsFunction
+  readonly productsDb: dynamo.Table
 
   constructor(scope: Construct, id: string, props?:cdk.StackProps) {
     super(scope, id, props)
+
+    this.productsDb = new dynamo.Table(this, "ProductsDb", {
+      tableName: 'products',
+      removalPolicy: cdk.RemovalPolicy.DESTROY,
+      partitionKey: {
+        name: "id",
+        type: dynamo.AttributeType.STRING
+      },
+      billingMode: cdk.aws_dynamodb.BillingMode.PROVISIONED,
+      readCapacity: 1,
+      writeCapacity: 1
+    })
 
     this.productsFetchHandler = new lambdaNodeJs.NodejsFunction(
       this,
@@ -23,8 +38,35 @@ export class ProductsAppStack extends cdk.Stack {
         bundling: {
           minify: true,
           sourceMap: false, // desabilita geração de mapas para realizar debugs.
+        },
+        environment: {
+          PRODUCTS_TABLE: this.productsDb.tableName
         }
       }
     )
+
+    this.productsDb.grantReadData(this.productsFetchHandler)
+
+    this.productsAdminHandler = new lambdaNodeJs.NodejsFunction(
+      this,
+      "ProductsAdminFunction",
+      {
+        functionName: "ProductsAdminFunction",
+        entry: "lambda/products/productsAdminFunction.ts",
+        handler: "handler",
+        memorySize: 128,
+        timeout: cdk.Duration.seconds(5),
+        runtime: lambda.Runtime.NODEJS_16_X,
+        bundling: {
+          minify: true,
+          sourceMap: false, // desabilita geração de mapas para realizar debugs.
+        },
+        environment: {
+          PRODUCTS_TABLE: this.productsDb.tableName
+        }
+      }
+    )
+
+    this.productsDb.grantWriteData(this.productsAdminHandler)
   }
 }

@@ -11,24 +11,33 @@ export const handler = async (
 
     console.log(`API Gateway RequestId: ${apiRequestId} - Lambda RequestId: ${lambdaRequestId}`)
 
-    const method = event.httpMethod === "GET"
-    if(event.resource === "/products" && method) {
-      console.log("GET")
+    // const method = event.httpMethod === "GET"
+    if(event.resource === "/products" && event.httpMethod === "POST") {
+      console.log("POST /products")
 
       return {
-        statusCode: 200,
-        body: JSON.stringify({message: "Succes"})
+        statusCode: 201,
+        body: JSON.stringify({message: "POST /products"})
       }
     } else if(event.resource === "/products/{id}") {
-
       const productId = event.pathParameters?.id as string
 
-      console.log(`GET products/${productId}`)
+      if(event.httpMethod === "PUT") {
+        console.log("PUT /products")
+        return {
+          statusCode: 204,
+          body: JSON.stringify({message: `${productId} atualizado!`})
+        }
 
-      return {
-        statusCode: 200,
-        body: JSON.stringify({message: `products/${productId}`})
+      } else if(event.httpMethod === "DELETE") {
+        console.log("DELETE /products")
+        return {
+          statusCode: 204,
+          body: JSON.stringify({message: `${productId} deletado!`})
+        }
       }
+
+
     }
 
     return {
