@@ -2,6 +2,7 @@ import * as lambda from "aws-cdk-lib/aws-lambda"
 import * as lambdaNodeJs from "aws-cdk-lib/aws-lambda-nodejs"
 import * as cdk from "aws-cdk-lib"
 import * as dynamo from "aws-cdk-lib/aws-dynamodb"
+import * as ssm from "aws-cdk-lib/aws-ssm"
 
 import { Construct } from "constructs"
 
@@ -23,7 +24,11 @@ export class ProductsAppStack extends cdk.Stack {
       billingMode: cdk.aws_dynamodb.BillingMode.PROVISIONED,
       readCapacity: 1,
       writeCapacity: 1
-    })
+    },)
+
+    // Products Layer
+    const productsLayerArn = ssm.StringParameter.valueForStringParameter(this, 'ProductsLayerVersionArn')
+    const productsLayer = lambda.LayerVersion.fromLayerVersionArn(this, "ProductsLayerVersionArn", productsLayerArn)
 
     this.productsFetchHandler = new lambdaNodeJs.NodejsFunction(
       this,
@@ -35,12 +40,13 @@ export class ProductsAppStack extends cdk.Stack {
         memorySize: 128,
         timeout: cdk.Duration.seconds(5),
         runtime: lambda.Runtime.NODEJS_16_X,
+        layers: [productsLayer],
         bundling: {
           minify: true,
           sourceMap: false, // desabilita geração de mapas para realizar debugs.
         },
         environment: {
-          PRODUCTS_TABLE: this.productsDb.tableName
+          PRODUCTS_DDB: this.productsDb.tableName
         }
       }
     )
@@ -57,12 +63,13 @@ export class ProductsAppStack extends cdk.Stack {
         memorySize: 128,
         timeout: cdk.Duration.seconds(5),
         runtime: lambda.Runtime.NODEJS_16_X,
+        layers: [productsLayer],
         bundling: {
           minify: true,
           sourceMap: false, // desabilita geração de mapas para realizar debugs.
         },
         environment: {
-          PRODUCTS_TABLE: this.productsDb.tableName
+          PRODUCTS_DDB: this.productsDb.tableName
         }
       }
     )
