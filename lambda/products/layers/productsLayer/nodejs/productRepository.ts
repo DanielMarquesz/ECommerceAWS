@@ -7,6 +7,7 @@ export type ProductType = {
   code: string
   price: number
   model: string
+  productUrl?: string
 }
 
 export class ProductRepository {
@@ -73,13 +74,15 @@ export class ProductRepository {
         '#name': 'name',
         '#code': 'code',
         '#price': 'price',
-        '#model': 'model'
+        '#model': 'model',
+        '#productUrl': 'productUrl'
       },
       ExpressionAttributeValues: {
         ':name': product.name,
         ':code': product.code,
         ':price': product.price,
-        ':model': product.model
+        ':model': product.model,
+        ':productUrl': product.productUrl
       },
       ReturnValues: 'UPDATED_NEW'
     }).promise()
