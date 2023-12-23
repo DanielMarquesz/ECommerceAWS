@@ -69,7 +69,7 @@ export class ProductRepository {
       TableName: this.tableName,
       Key: { id },
       ConditionExpression: 'attribute_exists(id)',
-      UpdateExpression: 'set #name = :name, #code = :code, #price = :price, #model = :model',
+      UpdateExpression: 'set #name = :name, #code = :code, #price = :price, #model = :model, #productUrl = :productUrl',
       ExpressionAttributeNames: {
         '#name': 'name',
         '#code': 'code',
