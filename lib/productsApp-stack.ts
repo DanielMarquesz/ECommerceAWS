@@ -45,6 +45,7 @@ export class ProductsAppStack extends cdk.Stack {
           minify: true,
           sourceMap: false, // desabilita geração de mapas para realizar debugs.
         },
+        tracing: lambda.Tracing.ACTIVE,
         environment: {
           PRODUCTS_DDB: this.productsDb.tableName
         }
@@ -68,6 +69,7 @@ export class ProductsAppStack extends cdk.Stack {
           minify: true,
           sourceMap: false, // desabilita geração de mapas para realizar debugs.
         },
+        tracing: lambda.Tracing.ACTIVE,
         environment: {
           PRODUCTS_DDB: this.productsDb.tableName
         }
