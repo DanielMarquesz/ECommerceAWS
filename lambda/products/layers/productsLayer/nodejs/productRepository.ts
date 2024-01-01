@@ -1,7 +1,7 @@
 import { DocumentClient } from 'aws-sdk/clients/dynamodb'
 import { v4 as uuid } from 'uuid'
 
-export type ProductType = {
+export type Product = {
   id: string
   name: string
   code: string
@@ -19,15 +19,15 @@ export class ProductRepository {
     this.tableName = tableName
   }
 
-  async getProducts(): Promise<ProductType[]> {
+  async getProducts(): Promise<Product[]> {
     const result = await this.ddbClient.scan({
       TableName: this.tableName
     }).promise()
 
-    return result.Items as ProductType[]
+    return result.Items as Product[]
   }
 
-  async getProductById(id: string): Promise<ProductType> {
+  async getProductById(id: string): Promise<Product> {
     const result = await this.ddbClient.get({
       TableName: this.tableName,
       Key: { id }
@@ -37,10 +37,10 @@ export class ProductRepository {
       throw new Error('Product not found')
     }
 
-    return result.Item as ProductType
+    return result.Item as Product
   }
 
-  async createProduct(product: ProductType): Promise<ProductType> {
+  async createProduct(product: Product): Promise<Product> {
     const id = uuid()
     const newProduct = { ...product, id }
 
@@ -64,7 +64,7 @@ export class ProductRepository {
     }
   }
 
-  async updateProduct(id: string, product: ProductType): Promise<ProductType> {
+  async updateProduct(id: string, product: Product): Promise<Product> {
     const result = await this.ddbClient.update({
       TableName: this.tableName,
       Key: { id },

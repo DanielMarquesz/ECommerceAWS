@@ -9,16 +9,29 @@ export class ProductsAppLayersStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props)
 
-    this.productsLayer = new lambda.LayerVersion(this, "ProductsLayer", {
+    const productsLayer = new lambda.LayerVersion(this, "ProductsLayer", {
       code: lambda.Code.fromAsset("lambda/products/layers/productsLayer"),
-      compatibleRuntimes: [lambda.Runtime.NODEJS_14_X],
+      compatibleRuntimes: [lambda.Runtime.NODEJS_20_X],
       layerVersionName: "ProductsLayer",
       removalPolicy: cdk.RemovalPolicy.RETAIN, // mantem o Layer casoa  stack seja destruida
     })
 
     new ssm.StringParameter(this, "ProductsLayerVersionArn", {
       parameterName: "ProductsLayerVersionArn",
-      stringValue: this.productsLayer.layerVersionArn,
+      stringValue: productsLayer.layerVersionArn,
+    })
+
+
+    const productsEventsLayer = new lambda.LayerVersion(this, "ProductsEventsLayer", {
+      code: lambda.Code.fromAsset("lambda/products/layers/productsEventsLayer"),
+      compatibleRuntimes: [lambda.Runtime.NODEJS_20_X],
+      layerVersionName: "ProductsEventsLayer",
+      removalPolicy: cdk.RemovalPolicy.RETAIN, // mantem o Layer casoa  stack seja destruida
+    })
+
+    new ssm.StringParameter(this, "ProductsEventsLayerVersionArn", {
+      parameterName: "ProductsEventsLayerVersionArn",
+      stringValue: productsEventsLayer.layerVersionArn,
     })
   }
 }
