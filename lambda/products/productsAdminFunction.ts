@@ -55,7 +55,7 @@ export const handler = async (
 
           const invocationResponse = await sendProductEvent(
             result,
-            ProductEventEnum.CREATED,
+            ProductEventEnum.UPDATED,
             'daniel.mango@email.com',
             lambdaRequestId,
             apiRequestId
@@ -72,10 +72,21 @@ export const handler = async (
           }
   
         } else if(event.httpMethod === "DELETE") {
-          console.log("DELETE /products")
-  
+          console.log("DELETE /products")          
+          
+          const result = await productRepository.getProductById(productId)
           
           await productRepository.deleteProduct(productId)
+
+            const invocationResponse = await sendProductEvent(
+            result,
+            ProductEventEnum.DELETED,
+            'daniel.mango@email.com',
+            lambdaRequestId,
+            apiRequestId
+            )
+  
+            console.log('Invoke Response Update', invocationResponse)
   
           return {
             statusCode: 204,
@@ -104,6 +115,8 @@ function sendProductEvent(product: Product, eventType: ProductEventEnum, email: 
     productPrice: product.price,
     email,
   }
+
+  console.log("Invoking ProductsEventsFunction")
 
   const params = {
     FunctionName: productsEventsFunctionName,

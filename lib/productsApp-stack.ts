@@ -112,6 +112,8 @@ export class ProductsAppStack extends cdk.Stack {
     )
 
     this.productsDb.grantWriteData(this.productsAdminHandler)
+    this.productsDb.grantReadData(this.productsAdminHandler)
+    
     productsEventsHandler.grantInvoke(this.productsAdminHandler)
   }
 }

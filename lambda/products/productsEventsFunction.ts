@@ -8,7 +8,7 @@ AWSXRay.captureAWS(require("aws-sdk"))
 const eventsDdb = process.env.EVENTS_DDB as string
 const ddbClient = new DynamoDB.DocumentClient()
 
-export async function name(event: ProductEvent, context: Context, callback: Callback) {
+export async function handler(event: ProductEvent, context: Context, callback: Callback) {
   console.log(event)
   console.log(`Lambda requestId: ${context.awsRequestId}`)
 
@@ -25,7 +25,7 @@ export async function name(event: ProductEvent, context: Context, callback: Call
 
 function createEvent(event: ProductEvent) {
   const timestamp = Date.now()
-  const ttl = ~~(timestamp / 100) + 5 * 60
+  const ttl = Math.floor(timestamp / 100) + 5 * 60
 
   return ddbClient.put({
     TableName: eventsDdb,

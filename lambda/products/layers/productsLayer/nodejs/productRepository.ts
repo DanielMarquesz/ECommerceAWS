@@ -52,7 +52,7 @@ export class ProductRepository {
     return newProduct
   }
 
-  async deleteProduct(id: string): Promise<void> {
+  async deleteProduct(id: string): Promise<Product> {
     const result = await this.ddbClient.delete({
       TableName: this.tableName,
       Key: { id },
@@ -62,6 +62,8 @@ export class ProductRepository {
     if(!result.Attributes) {
       throw new Error('Cannot delete product')
     }
+
+    return result as unknown as Product
   }
 
   async updateProduct(id: string, product: Product): Promise<Product> {
