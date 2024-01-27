@@ -87,6 +87,7 @@ export const handler = async (
             )
   
             console.log('Invoke Response Update', invocationResponse)
+            console.log('Produto deletadi', result.id)
   
           return {
             statusCode: 204,
