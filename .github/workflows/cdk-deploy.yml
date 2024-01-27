@@ -36,4 +36,4 @@ jobs:
       #   run: cdk synth
 
       - name: Deploy stack
-        run: cdk deploy --all --require-approval never --method=direct
+        run: cdk deploy --all --require-approval never --method=direct --no-previous-parameters --no-asset-metadata --no-path-metadata --no-staging --no-version-reporting

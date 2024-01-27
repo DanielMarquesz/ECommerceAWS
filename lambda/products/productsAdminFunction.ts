@@ -81,7 +81,7 @@ export const handler = async (
             const invocationResponse = await sendProductEvent(
             result,
             ProductEventEnum.DELETED,
-            'daniel.mango@email.com',
+            'daniel.manga@email.com',
             lambdaRequestId,
             apiRequestId
             )
