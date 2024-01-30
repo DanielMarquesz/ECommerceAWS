@@ -32,8 +32,11 @@ export class OrdersAppStack extends cdk.Stack {
     })
 
     // Orders Layer
-    const ordersLayerArn = ssm.StringParameter.valueForStringParameter(this, 'OrdersLayerVersionArn')
-    const ordersLayer = lambda.LayerVersion.fromLayerVersionArn(this, "OrderssLayerVersionArn", ordersLayerArn)
+    const ordersLayerArn = ssm.StringParameter.valueForStringParameter(this, 'OrdersLayerVersionArn')    
+    const ordersLayer = lambda.LayerVersion.fromLayerVersionArn(this, "OrdersLayerVersionArn", ordersLayerArn)
+
+    const ordersApiLayerArn = ssm.StringParameter.valueForStringParameter(this, 'OrdersApiLayerVersionArn')
+    const ordersApiLayer = lambda.LayerVersion.fromLayerVersionArn(this, "OrdersApiLayerVersionArn", ordersApiLayerArn)
 
     // Products Layer
     const productsLayerArn = ssm.StringParameter.valueForStringParameter(this, 'ProductsLayerVersionArn')
@@ -47,7 +50,7 @@ export class OrdersAppStack extends cdk.Stack {
       memorySize: 128,
       timeout: cdk.Duration.seconds(2),
       runtime: lambda.Runtime.NODEJS_20_X,
-      layers: [productsLayer, ordersLayer],
+      layers: [productsLayer, ordersLayer, ordersApiLayer],
       bundling: {
         minify: true,
         sourceMap: false,
