@@ -86,16 +86,23 @@ export class OrderRepository {
     return order.Item as Order
   }
 
-  async deleteOrder(email: string, orderId: string): Promise<void> {
+  async deleteOrder(email: string, orderId: string): Promise<Order> {
 
     console.log(`Deleting order by email: ${email} and orderId: ${orderId}`)
 
-    await this.ddbClient.delete({
+    const data = await this.ddbClient.delete({
       TableName: this.ordersDdb,
       Key: {
         pk: email,
         sk: orderId
-      }
+      },
+      ReturnValues: "ALL_OLD"
     }).promise()
+
+    if(data.Attributes) {
+      return data.Attributes as Order
+    } else {
+      throw new Error('Order not found')
+    }
   }
 }

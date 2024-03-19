@@ -30,12 +30,35 @@ export async function handler(event: APIGatewayProxyEvent, context: Context): Pr
       if(email) {
         if(orderId) {
           // Get one order from an user
+          try {
+            const order = await orderRepository.getOrder(email, orderId)
+            return {
+              statusCode: 200,
+              body: JSON.stringify(order)
+            }
+          } catch (error: any) {
+            console.log(`Error: ${error.message}`)
+            return {
+              statusCode: 404,
+              body: JSON.stringify('Error')
+            }
+          }
         } else {
           // Get all orders from an user
+          const orders = await orderRepository.getOrdersByEmail(email)
+          return {
+            statusCode: 200,
+            body: JSON.stringify(orders.map(convertToOrderResponse))
+          }
         }
       }
     } else {
       // Get all orders
+      const orders = await orderRepository.getOrders()
+      return {
+        statusCode: 200,
+        body: JSON.stringify(orders.map(convertToOrderResponse))
+      }
     }
   } else if(method === 'POST') {
     console.log('POST /orders')
@@ -61,8 +84,15 @@ export async function handler(event: APIGatewayProxyEvent, context: Context): Pr
 
   } else if (method === 'DELETE') {
     console.log('DELETE /orders')
-    const email = event.queryStringParameters!.email
-    const orderId = event.queryStringParameters!.orderId
+    const email = event.queryStringParameters!.email!
+    const orderId = event.queryStringParameters!.orderId!
+
+    const orderDelete = await orderRepository.deleteOrder(email,orderId)
+
+    return {
+      statusCode: 200,
+      body: JSON.stringify(convertToOrderResponse(orderDelete))
+    }
   }
 
   return {
