@@ -44,7 +44,7 @@ export class OrdersAppStack extends cdk.Stack {
 
     // Function Handler
     this.ordersHandler = new lambdaNodeJS.NodejsFunction(this, "OrdersFunction",{
-      functionName: "ProductsEventsFunction",
+      functionName: "OrdersFunction",
       entry: "lambda/orders/ordersFunction.ts",
       handler: "handler",
       memorySize: 128,
