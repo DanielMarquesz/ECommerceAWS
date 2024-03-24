@@ -40,7 +40,9 @@ export class EcommerceApiStack extends cdk.Stack {
       }
     })
 
+    // Create resources in API
     this.crateProductsService(props, api)
+    this.createOrdersService(props, api)
   }
 
   private crateProductsService(props: ECommerceApiStackProps, api: cdk.aws_apigateway.RestApi) {
