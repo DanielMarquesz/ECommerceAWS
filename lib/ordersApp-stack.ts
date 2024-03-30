@@ -47,7 +47,7 @@ export class OrdersAppStack extends cdk.Stack {
       functionName: "OrdersFunction",
       entry: "lambda/orders/ordersFunction.ts",
       handler: "handler",
-      memorySize: 128,
+      memorySize: 256,
       timeout: cdk.Duration.seconds(2),
       runtime: lambda.Runtime.NODEJS_20_X,
       layers: [productsLayer, ordersLayer, ordersApiLayer],
