@@ -49,6 +49,49 @@ export class EcommerceApiStack extends cdk.Stack {
   }
 
   private crateProductsService(props: ECommerceApiStackProps, api: cdk.aws_apigateway.RestApi) {
+
+    const productRequestValidator = new apigateway.RequestValidator(this, "ProductRequestValidator", {
+      restApi: api,
+      requestValidatorName: "Product request validator",
+      validateRequestBody: true
+    })
+
+    const productModel = new apigateway.Model(this, "ProductModel", {
+      modelName: "productModel",
+      restApi: api,
+      schema: {
+        type: apigateway.JsonSchemaType.OBJECT,
+        properties: {
+          name: {
+            type: apigateway.JsonSchemaType.STRING,
+          },
+          code: {
+            type: apigateway.JsonSchemaType.STRING,
+            minLength: 1
+          },
+          price: {
+            type: apigateway.JsonSchemaType.NUMBER,
+            minLength: 1
+          },
+          model: {
+            type: apigateway.JsonSchemaType.STRING,
+            minLength: 1
+          },
+          productUrl: {
+            type: apigateway.JsonSchemaType.STRING,
+            minLength: 1
+          },
+        },
+        required: [
+          "name",
+          "code",
+          "price",
+          "model",
+          "productUrl"
+        ]
+      }
+    })
+
     const productsFetchIntegration = new apigateway.LambdaIntegration(props.productsFetchHandler)
     const productsAdminIntegration = new apigateway.LambdaIntegration(props.productsAdminHandler)
 
@@ -61,7 +104,12 @@ export class EcommerceApiStack extends cdk.Stack {
     productIdResource.addMethod("GET", productsFetchIntegration)
 
     // POST /products
-    productsResource.addMethod("POST", productsAdminIntegration)
+    productsResource.addMethod("POST", productsAdminIntegration, {
+      requestValidator: productRequestValidator,
+      requestModels: {
+        "application/json" : productModel
+      }
+    })
 
     // PUT /products/{id}
     productIdResource.addMethod("PUT", productsAdminIntegration)
