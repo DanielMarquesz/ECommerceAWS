@@ -64,6 +64,7 @@ export class EcommerceApiStack extends cdk.Stack {
         properties: {
           name: {
             type: apigateway.JsonSchemaType.STRING,
+            minLength: 1
           },
           code: {
             type: apigateway.JsonSchemaType.STRING,
