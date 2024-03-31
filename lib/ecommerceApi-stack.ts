@@ -13,6 +13,9 @@ type ECommerceApiStackProps = cdk.StackProps & {
 
 export class EcommerceApiStack extends cdk.Stack {
 
+
+
+
   constructor(
     scope: Construct, 
     id: string,
