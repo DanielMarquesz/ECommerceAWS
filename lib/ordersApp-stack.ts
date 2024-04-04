@@ -3,6 +3,8 @@ import * as lambdaNodeJS from 'aws-cdk-lib/aws-lambda-nodejs'
 import * as cdk from 'aws-cdk-lib'
 import * as dynamodb from 'aws-cdk-lib/aws-dynamodb'
 import * as ssm from 'aws-cdk-lib/aws-ssm'
+import * as sns from "aws-cdk-lib/aws-sns"
+import * as subs from "aws-cdk-lib/aws-sns-subscriptions"
 import { Construct } from 'constructs'
 
 
@@ -38,9 +40,18 @@ export class OrdersAppStack extends cdk.Stack {
     const ordersApiLayerArn = ssm.StringParameter.valueForStringParameter(this, 'OrdersApiLayerVersionArn')
     const ordersApiLayer = lambda.LayerVersion.fromLayerVersionArn(this, "OrdersApiLayerVersionArn", ordersApiLayerArn)
 
+    // Orders event Layer
+    const orderEventsLayerArn = ssm.StringParameter.valueForStringParameter(this, 'OrdersEventsLayerVersionArn')
+    const ordersEventsLayer = lambda.LayerVersion.fromLayerVersionArn(this, "OrdersEventsLayerVersionArn", orderEventsLayerArn)
+
     // Products Layer
     const productsLayerArn = ssm.StringParameter.valueForStringParameter(this, 'ProductsLayerVersionArn')
     const productsLayer = lambda.LayerVersion.fromLayerVersionArn(this, "ProductsLayerVersionArn", productsLayerArn)
+
+    const ordersTopic = new sns.Topic(this, "OrderEventsTopic", {
+      displayName: "ORder events topic",
+      topicName: "order-events"
+    })
 
     // Function Handler
     this.ordersHandler = new lambdaNodeJS.NodejsFunction(this, "OrdersFunction",{
@@ -50,20 +61,22 @@ export class OrdersAppStack extends cdk.Stack {
       memorySize: 256,
       timeout: cdk.Duration.seconds(2),
       runtime: lambda.Runtime.NODEJS_20_X,
-      layers: [productsLayer, ordersLayer, ordersApiLayer],
+      layers: [productsLayer, ordersLayer, ordersApiLayer, ordersEventsLayer],
       bundling: {
         minify: true,
         sourceMap: false,
       },
       tracing: lambda.Tracing.ACTIVE,
-      insightsVersion: lambda.LambdaInsightsVersion.VERSION_1_0_119_0,
+      insightsVersion: lambda.LambdaInsightsVersion.VERSION_1_0_119_0,      
       environment: {
         PRODUCTS_DDB: props.productsDdb.tableName,
-        ORDERS_DDB: ordersDdb.tableName
+        ORDERS_DDB: ordersDdb.tableName,
+        ORDER_EVENTS_TOPIC_ARN: ordersTopic.topicArn
       }
     })
 
     ordersDdb.grantReadWriteData(this.ordersHandler)
     props.productsDdb.grantReadData(this.ordersHandler)
+    ordersTopic.grantPublish(this.ordersHandler)
   }
 }
