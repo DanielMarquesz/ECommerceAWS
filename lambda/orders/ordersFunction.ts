@@ -75,7 +75,11 @@ export async function handler(event: APIGatewayProxyEvent, context: Context): Pr
 
       const orderCreated = await orderRepository.createOrder(order)
 
-      await sendOrderEvent(order, OrderEventType.CREATED, context.awsRequestId)
+      const eventResult = await sendOrderEvent(orderCreated, OrderEventType.CREATED, context.awsRequestId)
+      console.log(`
+      Order created event sent - OrderId: ${orderCreated.sk}
+      - MessageId: ${eventResult.MessageId}
+      `)
 
       return {
         statusCode: 201,
@@ -96,7 +100,12 @@ export async function handler(event: APIGatewayProxyEvent, context: Context): Pr
 
     const orderDelete = await orderRepository.deleteOrder(email,orderId)
 
-    await sendOrderEvent(orderDelete, OrderEventType.DELETE, context.awsRequestId)
+    const eventResult = await sendOrderEvent(orderDelete, OrderEventType.DELETE, context.awsRequestId)
+    console.log(`
+    Order deleted event sent - OrderId: ${orderDelete.sk}
+    - MessageId: ${eventResult.MessageId}
+    `)
+
 
     return {
       statusCode: 200,
@@ -129,6 +138,7 @@ function sendOrderEvent(order: Order, eventType: OrderEventType, lambdaRequestId
     eventType,
     data: JSON.stringify(orderEvent)
   }
+  
   return snsClient.publish({
     TopicArn: orderEventsTopicArn,
     Message: JSON.stringify(envelope)
