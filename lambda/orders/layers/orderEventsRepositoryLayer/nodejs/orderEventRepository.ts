@@ -3,9 +3,9 @@ import { DocumentClient } from "aws-sdk/clients/dynamodb"
 export interface OrderEventDdb {
   pk: string
   sk: string
-  ttl: string
+  ttl: number
   email: string
-  createdAt: string
+  createdAt: number
   requestId: string
   eventType: string
   info: {
